@@ -1,0 +1,17 @@
+edge(a,1).
+edge(a,3).
+edge(1,2).
+edge(1,4).
+edge(2,5).
+edge(3,4).
+edge(4,5).
+path(X,Y):-
+    edge(X,Y),
+    write(X),
+    write('-->'),
+    write(Y).
+path(X,Z):-
+    edge(X,Y),
+    write(X),
+    write('-->'),
+    path(Y,Z).
