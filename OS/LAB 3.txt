@@ -1,0 +1,116 @@
+IMPLEMENTING SYSTEM CALL USING WRITE() AND READ()
+
+using write()
+
+vim writeprogram.c
+
+#include<unistd.h>
+
+int main(){
+	write(1, "I am Bigyan Adhikari", 20);
+}S
+
+using read()
+
+vim readprogram.c
+
+#include<unistd.h>
+
+int main(){
+
+	char buff[20];
+	read(0, buff, 10);
+	write(1, buff, 10);
+
+}
+
+
+PROCESS MANAGEMENT IN RHEL
+Method 1: using top command 
+Method 2: using the ps commandss
+
+stop a process using the Kill command
+eg: Kill -9
+
+CREATE A PROCESS USING FORK() METHOD IN LINUX
+
+vim firstfork.c
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+
+int main(){
+	fork{};
+	printf("Hello World!");
+	printf("/n")
+	return 0;
+}
+
+gcc -o firstfork firstfork.c
+./firstfork
+Hello World
+
+THREAD SIMULATION IN RHEL
+
+vim multithread.c
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h> //Header file for sleep(). man 3 sleep for details.
+#include <pthread.h>
+// A normal C function that is executed as a thread
+// when its name is specified in pthread_create()
+void *myThreadFun(void *vargp)
+{
+sleep(1);
+printf("Printing GeeksQuiz from Thread \n");
+return NULL;
+}
+int main()
+{
+pthread_t thread_id;
+printf("Before Thread\n");
+pthread_create(&thread_id, NULL, myThreadFun, NULL);
+pthread_join(thread_id, NULL);
+printf("After Thread\n");
+exit(0);
+}
+
+gcc multithread.c -lpthread
+./a.out
+
+
+
+program to show multiple threads with global and static variables
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+// Let us create a global variable to change it in threads
+int g = 0;
+// The function to be executed by all threads
+void *myThreadFun(void *vargp)
+{
+// Store the value argument passed to this thread
+int *myid = (int *)vargp;
+// Let us create a static variable to observe its changes
+static int s = 0;
+// Change static and global variables
+++s; ++g;
+// Print the argument, static and global variables
+printf("Thread ID: %d, Static: %d, Global: %d\n", *myid, ++s, ++g);
+}
+int main()
+{
+int i;
+pthread_t tid;
+// Let us create three threads
+for (i = 0; i < 3; i++)
+pthread_create(&tid, NULL, myThreadFun, (void *)&tid);
+pthread_exit(NULL);
+return 0;
+}
+
+gfg@ubuntu:~/$ gcc multithreadedgv.c -lpthread
+gfg@ubuntu:~/$ ./a.out
