@@ -1,0 +1,41 @@
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Define the dimensions of the array
+        int xSize = 3;
+        int ySize = 3;
+        int zSize = 3;
+
+        // Declare a 3-dimensional array
+        int[,,] threeDimArray = new int[xSize, ySize, zSize];
+
+        // Populate the array with values
+        for (int x = 0; x < xSize; x++)
+        {
+            for (int y = 0; y < ySize; y++)
+            {
+                for (int z = 0; z < zSize; z++)
+                {
+                    threeDimArray[x, y, z] = x + y + z;
+                }
+            }
+        }
+
+        // Print the values of the array
+        Console.WriteLine("Values of the 3-dimensional array:");
+        for (int x = 0; x < xSize; x++)
+        {
+            for (int y = 0; y < ySize; y++)
+            {
+                for (int z = 0; z < zSize; z++)
+                {
+                    Console.WriteLine($"Value at [{x}, {y}, {z}] = {threeDimArray[x, y, z]}");
+                }
+            }
+        }
+    }
+}
+

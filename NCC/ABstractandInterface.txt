@@ -1,0 +1,58 @@
+using System;
+
+// Define an abstract class Animal
+abstract class Animal
+{
+    // Abstract method (does not have a body)
+    public abstract void MakeSound();
+
+    // Concrete method
+    public void Sleep()
+    {
+        Console.WriteLine("Sleeping...");
+    }
+}
+
+// Define an interface IMovable
+interface IMovable
+{
+    void Move();
+}
+
+// Define a concrete class Dog that inherits from Animal and implements IMovable
+class Dog : Animal, IMovable
+{
+    // Provide implementation for the abstract method
+    public override void MakeSound()
+    {
+        Console.WriteLine("Bark!");
+    }
+
+    // Provide implementation for the interface method
+    public void Move()
+    {
+        Console.WriteLine("Running...");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Create an instance of Dog
+        Dog myDog = new Dog();
+
+        // Call methods
+        myDog.MakeSound(); // Output: Bark!
+        myDog.Sleep();     // Output: Sleeping...
+        myDog.Move();      // Output: Running...
+
+        // Keep the console window open
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
+}
+
+
+
+

@@ -1,0 +1,39 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Create a list of student objects
+        List<Student> students = new List<Student>
+        {
+            new Student { FirstName = "John", LastName = "Doe", Address = "Lalitpur", College = "KCT" },
+            new Student { FirstName = "Alice", LastName = "Smith", Address = "Kathmandu", College = "KCT" },
+            new Student { FirstName = "Bob", LastName = "Johnson", Address = "Lalitpur", College = "KMC" },
+            new Student { FirstName = "Eve", LastName = "Brown", Address = "Lalitpur", College = "KCT" },
+            new Student { FirstName = "Charlie", LastName = "Wilson", Address = "Pokhara", College = "KCT" }
+        };
+
+        // Filter records by address and college, and order by first name descending
+        var filteredStudents = students
+            .Where(student => student.Address == "Lalitpur" && student.College == "KCT")
+            .OrderByDescending(student => student.FirstName);
+
+        // Display the filtered and ordered records
+        Console.WriteLine("Students with address Lalitpur and college KCT, ordered by first name descending:");
+        foreach (var student in filteredStudents)
+        {
+            Console.WriteLine($"{student.FirstName} {student.LastName}, Address: {student.Address}, College: {student.College}");
+        }
+    }
+}
+
+class Student
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Address { get; set; }
+    public string College { get; set; }
+}

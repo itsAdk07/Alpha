@@ -1,0 +1,93 @@
+using System;
+using System.IO;
+
+class FileHandlingExample
+{
+    static void Main()
+    {
+        string folderPath = "ExampleFolder";
+        string filePath1 = Path.Combine(folderPath, "File1.txt");
+        string filePath2 = Path.Combine(folderPath, "File2.txt");
+
+        // Create a new folder
+        CreateFolder(folderPath);
+
+        // Create files within the folder
+        CreateFile(filePath1);
+        CreateFile(filePath2);
+
+        // List files and folders
+        ListFilesAndFolders(folderPath);
+
+        // Select a specific file
+        SelectFile(filePath1);
+
+        // Keep the console window open
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
+
+    static void CreateFolder(string folderPath)
+    {
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+            Console.WriteLine($"Folder '{folderPath}' created successfully.");
+        }
+        else
+        {
+            Console.WriteLine($"Folder '{folderPath}' already exists.");
+        }
+    }
+
+    static void CreateFile(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            using (StreamWriter sw = File.CreateText(filePath))
+            {
+                sw.WriteLine("Hello, this is a sample file.");
+            }
+            Console.WriteLine($"File '{filePath}' created successfully.");
+        }
+        else
+        {
+            Console.WriteLine($"File '{filePath}' already exists.");
+        }
+    }
+
+    static void ListFilesAndFolders(string folderPath)
+    {
+        if (Directory.Exists(folderPath))
+        {
+            Console.WriteLine($"Listing contents of folder '{folderPath}':");
+            string[] entries = Directory.GetFileSystemEntries(folderPath);
+            foreach (string entry in entries)
+            {
+                Console.WriteLine(entry);
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Folder '{folderPath}' does not exist.");
+        }
+    }
+
+    static void SelectFile(string filePath)
+    {
+        if (File.Exists(filePath))
+        {
+            Console.WriteLine($"File '{filePath}' selected.");
+            using (StreamReader sr = File.OpenText(filePath))
+            {
+                string content = sr.ReadToEnd();
+                Console.WriteLine("File content:");
+                Console.WriteLine(content);
+            }
+        }
+        else
+        {
+            Console.WriteLine($"File '{filePath}' does not exist.");
+        }
+    }
+}
