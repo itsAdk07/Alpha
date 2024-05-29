@@ -1,0 +1,151 @@
+Program.cs
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Student}/{action=Index}/{id?}");
+
+app.Run();
+
+
+Models/AddStudentModel
+
+namespace StudentApp.Models
+{
+    public class AddStudentModel
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+}
+
+
+Models/Student.cs
+
+
+namespace StudentApp.Models
+{
+    public class Student
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+}
+
+
+Models/StudentViewModel.cs
+
+using System.Collections.Generic;
+
+namespace StudentApp.Models
+{
+    public class StudentViewModel
+    {
+        public List<Student> Students { get; set; } = new List<Student>();
+        public AddStudentModel NewStudent { get; set; } = new AddStudentModel();
+    }
+}
+
+
+Controllers/StudentController.cs
+
+using Microsoft.AspNetCore.Mvc;
+using StudentApp.Models;
+
+namespace StudentApp.Controllers
+{
+    public class StudentController : Controller
+    {
+        private static List<Student> students = new List<Student>();
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            var model = new StudentViewModel { Students = students };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Index(StudentViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var newStudent = new Student
+                {
+                    Id = students.Count + 1, // or use a proper ID generation method
+                    FirstName = model.NewStudent.FirstName,
+                    LastName = model.NewStudent.LastName
+                };
+                students.Add(newStudent);
+            }
+            model.Students = students;
+            model.NewStudent = new AddStudentModel(); // Reset the new student form
+            return View(model);
+        }
+    }
+}
+
+Views/Student/Index.cshtml:
+
+@model StudentApp.Models.StudentViewModel
+
+<h2>Add Student</h2>
+
+<form method="post">
+    <div>
+        <label>First Name:</label>
+        <input type="text" asp-for="NewStudent.FirstName" />
+    </div>
+    <div>
+        <label>Last Name:</label>
+        <input type="text" asp-for="NewStudent.LastName" />
+    </div>
+    <div>
+        <button type="submit">Add Student</button>
+    </div>
+</form>
+
+<h2>Student List</h2>
+<table>
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model.Students)
+        {
+            <tr>
+                <td>@student.FirstName</td>
+                <td>@student.LastName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

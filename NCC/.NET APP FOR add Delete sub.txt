@@ -1,0 +1,137 @@
+Model/ArithmeticModel.cs
+
+namespace ArithmeticApp.Models
+{
+    public class ArithmeticModel
+    {
+        public double Number1 { get; set; }
+        public double Number2 { get; set; }
+        public string Operation { get; set; }
+        public double Result { get; set; }
+    }
+}
+
+
+Controllers/ArithmeticController.cs
+
+using Microsoft.AspNetCore.Mvc;
+using ArithmeticApp.Models;
+
+namespace ArithmeticApp.Controllers
+{
+    public class ArithmeticController : Controller
+    {
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Index(ArithmeticModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                switch (model.Operation)
+                {
+                    case "Add":
+                        model.Result = model.Number1 + model.Number2;
+                        break;
+                    case "Subtract":
+                        model.Result = model.Number1 - model.Number2;
+                        break;
+                    case "Divide":
+                        if (model.Number2 != 0)
+                            model.Result = model.Number1 / model.Number2;
+                        else
+                            ModelState.AddModelError("", "Division by zero is not allowed.");
+                        break;
+                    default:
+                        ModelState.AddModelError("", "Invalid operation.");
+                        break;
+                }
+            }
+
+            return View(model);
+        }
+    }
+}
+
+
+
+Views/Arithmetic/Index.cshtml
+
+@model ArithmeticApp.Models.ArithmeticModel
+
+<h2>Arithmetic Operations</h2>
+
+<form method="post">
+    <div>
+        <label>Number 1:</label>
+        <input type="number" step="any" asp-for="Number1" />
+    </div>
+    <div>
+        <label>Number 2:</label>
+        <input type="number" step="any" asp-for="Number2" />
+    </div>
+    <div>
+        <label>Operation:</label>
+        <select asp-for="Operation">
+            <option value="Add">Add</option>
+            <option value="Subtract">Subtract</option>
+            <option value="Divide">Divide</option>
+        </select>
+    </div>
+    <div>
+        <button type="submit">Calculate</button>
+    </div>
+</form>
+
+@if (Model != null && ViewData.ModelState.IsValid)
+{
+    <h3>Result: @Model.Result</h3>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul>
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <li>@error.ErrorMessage</li>
+        }
+    </ul>
+}
+
+
+Program.cs
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Arithmetic}/{action=Index}/{id?}");
+
+app.Run();

@@ -1,0 +1,185 @@
+Create a Student model in the Models folder.
+
+namespace YourNamespace.Models
+{
+    public class Student
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+    }
+}
+
+
+StudentController.cs
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using YourNamespace.Models;
+using System.Text.Json;
+
+namespace YourNamespace.Controllers
+{
+    public class StudentController : Controller
+    {
+        // GET: Student/Input
+        public IActionResult Input()
+        {
+            return View();
+        }
+
+        // POST: Student/Input
+        [HttpPost]
+        public IActionResult Input(Student student)
+        {
+            if (ModelState.IsValid)
+            {
+                // Store data in session
+                HttpContext.Session.SetString("Student", JsonSerializer.Serialize(student));
+
+                // Store data in cookies
+                CookieOptions options = new CookieOptions
+                {
+                    Expires = DateTime.Now.AddMinutes(30)
+                };
+                Response.Cookies.Append("Student", JsonSerializer.Serialize(student), options);
+
+                return RedirectToAction("Show");
+            }
+
+            return View(student);
+        }
+
+        // GET: Student/Show
+        public IActionResult Show()
+        {
+            // Retrieve data from session
+            var studentFromSession = HttpContext.Session.GetString("Student");
+            var studentFromSessionObj = JsonSerializer.Deserialize<Student>(studentFromSession);
+
+            // Retrieve data from cookies
+            var studentFromCookies = Request.Cookies["Student"];
+            var studentFromCookiesObj = JsonSerializer.Deserialize<Student>(studentFromCookies);
+
+            ViewBag.StudentFromSession = studentFromSessionObj;
+            ViewBag.StudentFromCookies = studentFromCookiesObj;
+
+            return View();
+        }
+    }
+}
+
+Create a new view named Input.cshtml in the Views/Student folder.
+
+
+@model YourNamespace.Models.Student
+
+@{
+    ViewData["Title"] = "Input";
+}
+
+<h1>Input Student Information</h1>
+
+<form asp-action="Input" method="post">
+    <div class="form-group">
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
+Create a new view named Show.cshtml in the Views/Student folder.@{
+    ViewData["Title"] = "Show";
+}
+
+<h1>Show Student Information</h1>
+
+<h2>From Session:</h2>
+@if (ViewBag.StudentFromSession != null)
+{
+    <p>First Name: @ViewBag.StudentFromSession.FirstName</p>
+    <p>Last Name: @ViewBag.StudentFromSession.LastName</p>
+    <p>Email: @ViewBag.StudentFromSession.Email</p>
+}
+else
+{
+    <p>No student information in session.</p>
+}
+
+<h2>From Cookies:</h2>
+@if (ViewBag.StudentFromCookies != null)
+{
+    <p>First Name: @ViewBag.StudentFromCookies.FirstName</p>
+    <p>Last Name: @ViewBag.StudentFromCookies.LastName</p>
+    <p>Email: @ViewBag.StudentFromCookies.Email</p>
+}
+else
+{
+    <p>No student information in cookies.</p>
+}
+
+
+Ensure session services are added and configured in Program.cs.
+
+
+
+using Microsoft.EntityFrameworkCore;
+using YourNamespace.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+// Register the DbContext
+builder.Services.AddDbContext<LibraryContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), 
+    new MySqlServerVersion(new Version(8, 0, 21))));
+
+// Add session services
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+app.UseSession();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
