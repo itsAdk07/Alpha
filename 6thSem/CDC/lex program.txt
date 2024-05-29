@@ -1,0 +1,113 @@
+/*lex program to count number of words*/
+%{ 
+#include<stdio.h> 
+#include<string.h> 
+int i = 0; 
+%} 
+
+/* Rules Section*/
+%% 
+([a-zA-Z0-9])* {i++;} /* Rule for counting 
+						number of words*/
+
+"\n" {printf("%d\n", i); i = 0;} 
+%% 
+
+int yywrap(void){} 
+
+int main() 
+{ 
+	// The function that starts the analysis 
+	yylex(); 
+
+	return 0; 
+} 
+ 
+
+
+----------------------------------------------------------
+
+/*Lex program to take check whether 
+the given number is even or odd */
+
+%{ 
+#include<stdio.h> 
+int i; 
+%} 
+
+%% 
+
+[0-9]+	 {i=atoi(yytext); 
+		if(i%2==0) 
+			printf("Even"); 
+		else
+		printf("Odd");} 
+%% 
+
+int yywrap(){} 
+
+/* Driver code */
+int main() 
+{ 
+
+	yylex(); 
+	return 0; 
+} 
+
+-----------------------------------------------------
+
+/* Lex program to Identify and Count 
+Positive and Negative Numbers */
+%{ 
+int positive_no = 0, negative_no = 0; 
+%} 
+
+/* Rules for identifying and counting 
+positive and negative numbers*/
+%% 
+^[-][0-9]+ {negative_no++; 
+			printf("negative number = %s\n", 
+				yytext);} // negative number 
+
+[0-9]+ {positive_no++; 
+		printf("positive number = %s\n", 
+				yytext);} // positive number	 
+%% 
+
+/*** use code section ***/
+
+int yywrap(){} 
+int main()											 
+{ 
+
+yylex(); 
+printf ("number of positive numbers = %d,"
+		"number of negative numbers = %d\n", 
+				positive_no, negative_no); 
+
+return 0; 
+} 
+
+
+------------------------------------------
+
+/* Lex program to check whether input is digit or not. */
+%{ 
+#include<stdio.h> 
+#include<stdlib.h> 
+%} 
+/* Rule Section */
+%% 
+^[0-9]* printf("digit"); 
+^[^0-9]|[0-9]*[a-zA-Z] printf("not a digit"); 
+. ; 
+%% 
+int yywrap() {}
+int main() 
+{ 
+		// The function that starts the analysis 
+	yylex(); 
+		return 0; 
+} 
+
+
