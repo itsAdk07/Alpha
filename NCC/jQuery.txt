@@ -1,0 +1,104 @@
+User.cs (Model)
+
+
+namespace YourNamespace.Models
+{
+    public class User
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+}
+
+
+
+AccountController.cs
+using Microsoft.AspNetCore.Mvc;
+using YourNamespace.Models;
+
+namespace YourNamespace.Controllers
+{
+    public class AccountController : Controller
+    {
+        // GET: Account/Login
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        // POST: Account/Login
+        [HttpPost]
+        public IActionResult Login(User user)
+        {
+            if (ModelState.IsValid)
+            {
+                // Validate the user credentials (this is just a simple example)
+                if (user.Username == "admin" && user.Password == "password")
+                {
+                    // Redirect to a different page upon successful login
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    // Display an error message if credentials are invalid
+                    ModelState.AddModelError("", "Invalid username or password.");
+                }
+            }
+
+            return View(user);
+        }
+    }
+}
+
+
+Views/Account/Login.cshtml
+
+@model YourNamespace.Models.User
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Login</h1>
+
+<form asp-action="Login" method="post" id="loginForm">
+    <div class="form-group">
+        <label asp-for="Username"></label>
+        <input asp-for="Username" class="form-control" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#loginForm").submit(function (event) {
+                var isValid = true;
+                var username = $("#Username").val().trim();
+                var password = $("#Password").val().trim();
+
+                if (username.length === 0) {
+                    isValid = false;
+                    alert("Username is required.");
+                }
+
+                if (password.length === 0) {
+                    isValid = false;
+                    alert("Password is required.");
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+}
